@@ -3,7 +3,7 @@
 <head>
   <title>ПравИло</title>
   <link rel="stylesheet" href="style.css">
-  <meta charset="UTF-8"> <!-- Явно вказуємо кодування UTF-8 -->
+  <meta charset="UTF-8">
   <style>
     /* Додаємо тут будь-які додаткові стилі, якщо потрібно */
     .container {
@@ -28,6 +28,12 @@
     .button-container {
       margin-bottom: 10px;
     }
+    .description {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -44,15 +50,21 @@
     </div>
 
     <p id="status-label"></p>
+
+    <p class="description">
+      Цей інструмент виправляє типові помилки в українському тексті: подвійні пробіли, неправильні лапки (замінює на «та »),
+      некоректні апострофи (замінює на ’), довге тире (—), багатокрапки (...), видаляє зайві пробіли перед розділовими знаками
+      та виправляє лапки на початку рядка.
+    </p>
   </div>
 
   <script>
     function cleanupText() {
       let text = document.getElementById("text-input").value;
-    
+
       // Переконаємося, що текст обробляється без пошкодження
       text = text.normalize("NFC"); // Нормалізація тексту для уникнення проблем із кодуванням
-    
+
       // Замінюємо типові помилки
       text = text.replace(/ {2,}/g, " "); // Заміна подвійних і триваліших пробілів
       text = text.replace(/'"/g, "«");  // Відкриваюча лапка
@@ -63,13 +75,13 @@
       text = text.replace(/…/g, "...");  // Багатокрапка
       text = text.replace(/'/g, "’");    // Апостроф
       text = text.replace(/ʼ/g, "’");    // Альтернативний апостроф
-    
+
       // Видаляємо зайві пробіли перед розділовими знаками
       text = text.replace(/ \./g, ".");
       text = text.replace(/ ,/g, ",");
       text = text.replace(/ !/g, "!");
       text = text.replace(/ \?/g, "?");
-    
+
       // Пробіли перед лапками
       text = text.replace(/ “/g, " «");
       text = text.replace(/ "/g, " «");
@@ -79,14 +91,14 @@
       text = text.replace(/" /g, "» ");
       text = text.replace(/",/g, "»,");
       text = text.replace(/"\./g, "».");
-    
+
       // Заміна лапок на початку рядка
       text = text.replace(/^"/gm, "«"); // Замінює лапки " на початку кожного рядка на «
       text = text.replace(/^“/gm, "«"); // Замінює лапки " на початку кожного рядка на «
-    
+
       // Видаляємо всі випадкові знаки питання
       text = text.replace(/\?/g, ""); // Забираємо всі випадкові `?`
-    
+
       document.getElementById("text-input").value = text;
       document.getElementById("status-label").textContent = "Текст виправлено.";
     }
