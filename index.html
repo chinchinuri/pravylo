@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Text Cleanup Tool</title>
-  <link rel="stylesheet" href="style.css">  <!-- Підключаємо style.css -->
+  <link rel="stylesheet" href="style.css">
   <style>
     /* Додаємо тут будь-які додаткові стилі, якщо потрібно */
     .container {
@@ -18,10 +18,10 @@
       height: 300px;
       margin-bottom: 10px;
       padding: 10px;
-      border: 2px solid #767676;  /* Використовуємо змінну з style.css */
-      border-radius: 4px;         /* Використовуємо змінну з style.css */
+      border: 2px solid #767676;
+      border-radius: 4px;
       box-sizing: border-box;
-      font-size: 1rem;             /* Використовуємо змінну з style.css */
+      font-size: 1rem;
       line-height: 1.5;
     }
     .button-container {
@@ -48,33 +48,39 @@
     function cleanupText() {
       let text = document.getElementById("text-input").value;
 
+      // Кодуємо текст перед обробкою
+      text = encodeURIComponent(text);
+
       // Заміни
-      text = text.replace(/  /g, " ");
-      text = text.replace(/'"/g, "«");  // Відкриваюча лапка
-      text = text.replace(/"'/g, "»");  // Закриваюча лапка
-      text = text.replace(/ “/g, " «"); // Пробіл перед «
-      text = text.replace(/” /g, "» "); // Пробіл після »
-      text = text.replace(/”./g, "»."); // Крапка після »
-      text = text.replace(/”,/g, "»,"); // Кома після »
-      text = text.replace(/”\)/g, "»)"); // Дужка після »
-      text = text.replace(/«\)/g, "»)"); // Виправлення «) на »)
-      text = text.replace(/'/g, "’");    // Апостроф
-      text = text.replace(/ʼ/g, "’");    // Апостроф (різні коди)
-      text = text.replace(/ - /g, " — "); // Тире між словами
-      text = text.replace(/…/g, "...");  // Багатокрапка
-      text = text.replace(/„/g, "«");    // Німецькі лапки
-      text = text.replace(/“/g, "»");    // Американські лапки
-      text = text.replace(/–/g, "—");    // Коротке тире
+      text = text.replace(/%20%20/g, "%20"); // Подвійні пробіли
+      text = text.replace(/%27%22/g, "%C2%AB");  // Відкриваюча лапка
+      text = text.replace(/%22%27/g, "%C2%BB");  // Закриваюча лапка
+      text = text.replace(/%20%C2%AB/g, "%20%C2%AB"); // Пробіл перед «
+      text = text.replace(/%C2%BB%20/g, "%C2%BB%20"); // Пробіл після »
+      text = text.replace(/%C2%BB%2E/g, "%C2%BB%2E"); // Крапка після »
+      text = text.replace(/%C2%BB%2C/g, "%C2%BB%2C"); // Кома після »
+      text = text.replace(/%C2%BB%29/g, "%C2%BB%29"); // Дужка після »
+      text = text.replace(/%C2%AB%29/g, "%C2%BB%29"); // Виправлення «) на »)
+      text = text.replace(/%27/g, "%E2%80%99");    // Апостроф
+      text = text.replace(/%CB%8A/g, "%E2%80%99");    // Апостроф (різні коди)
+      text = text.replace(/%20-%20/g, "%20%E2%80%94%20"); // Тире між словами
+      text = text.replace(/%E2%80%A6/g, "%2E%2E%2E");  // Багатокрапка
+      text = text.replace(/%E2%80%9E/g, "%C2%AB");    // Німецькі лапки
+      text = text.replace(/%E2%80%9C/g, "%C2%BB");    // Американські лапки
+      text = text.replace(/%E2%80%93/g, "%E2%80%94");    // Коротке тире
 
       // Видалення пробілів перед розділовими знаками
-      text = text.replace(/ ,/g, ",");
-      text = text.replace(/ \./g, ".");
-      text = text.replace(/ !/g, "!");
-      text = text.replace(/ ?/g, "?");
+      text = text.replace(/%20%2C/g, "%2C");
+      text = text.replace(/%20%2E/g, "%2E");
+      text = text.replace(/%20%21/g, "%21");
+      text = text.replace(/%20%3F/g, "%3F");
 
       // Обробка лапок на початку рядка (регулярні вирази)
-      text = text.replace(/^"/mg, "«");  // На початку рядка
-      text = text.replace(/([.?!]\s*)"/g, "$1«"); // Після .?!
+      text = text.replace(/^%22/mg, "%C2%AB");  // На початку рядка
+      text = text.replace(/([%2E%3F%21]%20*)%22/g, "$1%C2%AB"); // Після .?!
+
+      // Декодуємо текст після обробки
+      text = decodeURIComponent(text);
 
       document.getElementById("text-input").value = text;
       document.getElementById("status-label").textContent = "Текст виправлено.";
