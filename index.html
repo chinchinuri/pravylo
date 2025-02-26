@@ -73,7 +73,11 @@
       text = text.replace(/ “/g, " «");
       text = text.replace(/ "/g, " «");
       text = text.replace(/” /g, "» ");
+      text = text.replace(/”,/g, "»,");
+      text = text.replace(/”\./g, "».");
       text = text.replace(/" /g, "» ");
+      text = text.replace(/",/g, "»,");
+      text = text.replace(/"\./g, "».");
     
       // Видаляємо всі випадкові знаки питання
       text = text.replace(/\?/g, ""); // Забираємо всі випадкові `?`
