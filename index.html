@@ -48,35 +48,34 @@
   <script>
     function cleanupText() {
       let text = document.getElementById("text-input").value;
-
-      // Заміни
-      text = text.replace(/  /g, " "); // Подвійні пробіли
+    
+      // Переконаємося, що текст обробляється без пошкодження
+      text = text.normalize("NFC"); // Нормалізація тексту для уникнення проблем із кодуванням
+    
+      // Замінюємо типові помилки
+      text = text.replace(/ {2,}/g, " "); // Заміна подвійних і триваліших пробілів
       text = text.replace(/'"/g, "«");  // Відкриваюча лапка
       text = text.replace(/"'/g, "»");  // Закриваюча лапка
-      text = text.replace(/ “/g, " «"); // Пробіл перед «
-      text = text.replace(/” /g, "» "); // Пробіл після »
-      text = text.replace(/”./g, "»."); // Крапка після »
-      text = text.replace(/”,/g, "»,"); // Кома після »
-      text = text.replace(/”\)/g, "»)"); // Дужка після »
-      text = text.replace(/«\)/g, "»)"); // Виправлення «) на »)
-      text = text.replace(/'/g, "’");    // Апостроф
-      text = text.replace(/ʼ/g, "’");    // Апостроф (різні коди)
-      text = text.replace(/ - /g, " — "); // Тире між словами
+      text = text.replace(/“/g, "«");    // Американські лапки
+      text = text.replace(/”/g, "»");    // Американські лапки
+      text = text.replace(/ - /g, " — "); // Довге тире
       text = text.replace(/…/g, "...");  // Багатокрапка
-      text = text.replace(/„/g, "«");    // Німецькі лапки
-      text = text.replace(/“/g, "»");    // Американські лапки
-      text = text.replace(/–/g, "—");    // Коротке тире
-
-      // Видалення пробілів перед розділовими знаками
-      text = text.replace(/ ,/g, ",");
+      text = text.replace(/'/g, "’");    // Апостроф
+      text = text.replace(/ʼ/g, "’");    // Альтернативний апостроф
+    
+      // Видаляємо зайві пробіли перед розділовими знаками
       text = text.replace(/ \./g, ".");
+      text = text.replace(/ ,/g, ",");
       text = text.replace(/ !/g, "!");
-      text = text.replace(/ \?/g, "?"); // Екранований знак питання
-
-      // Обробка лапок на початку рядка (регулярні вирази)
-      text = text.replace(/^"/mg, "«");  // На початку рядка
-      text = text.replace(/([.?!]\s*)"/g, "$1«"); // Після .?!
-  
+      text = text.replace(/ \?/g, "?");
+    
+      // Пробіли перед лапками
+      text = text.replace(/ “/g, " «");
+      text = text.replace(/” /g, "» ");
+    
+      // Видаляємо всі випадкові знаки питання
+      text = text.replace(/\?/g, ""); // Забираємо всі випадкові `?`
+    
       document.getElementById("text-input").value = text;
       document.getElementById("status-label").textContent = "Текст виправлено.";
     }
