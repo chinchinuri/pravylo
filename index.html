@@ -71,12 +71,12 @@
       text = text.replace(/ ,/g, ",");
       text = text.replace(/ \./g, ".");
       text = text.replace(/ !/g, "!");
-      text = text.replace(/ ?/g, "?");
+      text = text.replace(/ \?/g, "?"); // Екранований знак питання
 
       // Обробка лапок на початку рядка (регулярні вирази)
       text = text.replace(/^"/mg, "«");  // На початку рядка
       text = text.replace(/([.?!]\s*)"/g, "$1«"); // Після .?!
-
+  
       document.getElementById("text-input").value = text;
       document.getElementById("status-label").textContent = "Текст виправлено.";
     }
