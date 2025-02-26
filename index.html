@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text Cleanup Tool</title>
+  <link rel="stylesheet" href="style.css">  <!-- Підключаємо style.css -->
+  <style>
+    /* Додаємо тут будь-які додаткові стилі, якщо потрібно */
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      background-color: #f0f4f8;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 2px solid #767676;  /* Використовуємо змінну з style.css */
+      border-radius: 4px;         /* Використовуємо змінну з style.css */
+      box-sizing: border-box;
+      font-size: 1rem;             /* Використовуємо змінну з style.css */
+      line-height: 1.5;
+    }
+    .button-container {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Text Cleanup Tool</h1>
+
+    <textarea id="text-input"></textarea>
+
+    <div class="button-container">
+      <button onclick="cleanupText()">Виправити текст</button>
+      <button onclick="copyText()">Копіювати текст</button>
+      <button onclick="clearText()">Очистити поле</button>
+    </div>
+
+    <p id="status-label"></p>
+  </div>
+
+  <script>
+    function cleanupText() {
+      let text = document.getElementById("text-input").value;
+
+      // Заміни
+      text = text.replace(/  /g, " ");
+      text = text.replace(/'"/g, "«");  // Відкриваюча лапка
+      text = text.replace(/"'/g, "»");  // Закриваюча лапка
+      text = text.replace(/ “/g, " «"); // Пробіл перед «
+      text = text.replace(/” /g, "» "); // Пробіл після »
+      text = text.replace(/”./g, "»."); // Крапка після »
+      text = text.replace(/”,/g, "»,"); // Кома після »
+      text = text.replace(/”\)/g, "»)"); // Дужка після »
+      text = text.replace(/«\)/g, "»)"); // Виправлення «) на »)
+      text = text.replace(/'/g, "’");    // Апостроф
+      text = text.replace(/ʼ/g, "’");    // Апостроф (різні коди)
+      text = text.replace(/ - /g, " — "); // Тире між словами
+      text = text.replace(/…/g, "...");  // Багатокрапка
+      text = text.replace(/„/g, "«");    // Німецькі лапки
+      text = text.replace(/“/g, "»");    // Американські лапки
+      text = text.replace(/–/g, "—");    // Коротке тире
+
+      // Видалення пробілів перед розділовими знаками
+      text = text.replace(/ ,/g, ",");
+      text = text.replace(/ \./g, ".");
+      text = text.replace(/ !/g, "!");
+      text = text.replace(/ ?/g, "?");
+
+      // Обробка лапок на початку рядка (регулярні вирази)
+      text = text.replace(/^"/mg, "«");  // На початку рядка
+      text = text.replace(/([.?!]\s*)"/g, "$1«"); // Після .?!
+
+      document.getElementById("text-input").value = text;
+      document.getElementById("status-label").textContent = "Текст виправлено.";
+    }
+
+    function copyText() {
+      let text = document.getElementById("text-input").value;
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          document.getElementById("status-label").textContent = "Текст скопійовано до буфера обміну.";
+        })
+        .catch(err => {
+          document.getElementById("status-label").textContent = "Не вдалося скопіювати текст: " + err;
+        });
+    }
+
+    function clearText() {
+      document.getElementById("text-input").value = "";
+      document.getElementById("status-label").textContent = "Поле очищено.";
+    }
+  </script>
+</body>
+</html>
