@@ -45,127 +45,129 @@
   <script>
     // ==== ЛОГІКА ПЕРЕМИКАННЯ ТЕМИ ====
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      const isDarkMode = document.body.classList.contains('dark-mode');
-      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    }
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+}
 
-    // Застосовуємо збережену тему при завантаженні сторінки
-    document.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-      }
+// Застосовуємо збережену тему при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+  }
+});
+
+
+// ==== ОСНОВНА ЛОГІКА КОРЕКТОРА ====
+
+function cleanupText() {
+  let text = document.getElementById("text-input").value;
+  if (!text) {
+    updateStatus("Поле вводу порожнє.", 0);
+    return;
+  }
+  
+  let originalText = text;
+  let fixesCount = 0;
+
+  // Функція для застосування правила та підрахунку змін
+  function applyRule(rule) {
+    const newText = text.replace(rule.find, rule.replace);
+    if (text !== newText) {
+      const matches = text.match(rule.find);
+      if(matches) fixesCount += matches.length;
+    }
+    text = newText;
+  }
+
+  // Масив правил для виправлення тексту
+  const rules = [
+    // 1. Нормалізація (завжди першим)
+    { find: /[\r\n]+/g, replace: '\n' }, // Нормалізуємо переноси рядків
+
+    // 2. Видалення зайвих пробілів
+    { find: / {2,}/g, replace: ' ' }, // Подвійні пробіли
+    { find: /^\s+|\s+$/g, replace: '' }, // Пробіли на початку та в кінці тексту
+    
+    // ОСЬ ЦЕ ПРАВИЛО ВИДАЛЯЄ ПРОБІЛИ ПЕРЕД РОЗДІЛОВИМИ ЗНАКАМИ
+    { find: /\s+([.,;:!?»)])/g, replace: '$1' }, 
+    
+    { find: /\(\s+/g, replace: '(' }, // Пробіл після відкриваючої дужки
+    { find: /\s+\)/g, replace: ')' }, // Пробіл перед закриваючою дужкою
+
+    // 3. Правильний апостроф
+    { find: /['`ʼ]/g, replace: '’' },
+
+    // 4. Тире замість дефіса
+    { find: / - /g, replace: ' — ' }, // Довге тире між словами
+    { find: /^[-–] /gm, replace: '— ' }, // Тире на початку рядка для прямої мови
+
+    // 5. Виправлення багатокрапки
+    { find: /\.{2,}/g, replace: '...' },
+    { find: /…/g, replace: '...' }, // Уніфікація символу багатокрапки
+
+    // 6. Додавання необхідних пробілів
+    { find: /([.,;:!?»)])([^\s»”’])/g, replace: '$1 $2' }, // Додаємо пробіл після розділового знака, якщо його немає
+
+    // 7. Нерозривні пробіли (дуже корисно для типографії)
+    { find: /(\s[А-ЯІЇЄҐ])\.(\s*[А-ЯІЇЄҐ]\.)/g, replace: '$1.\u00A0$2' }, // Ініціали, напр. А. В. Шевченко
+    { find: /(\s[А-ЯІЇЄҐ]\.)(\s*[А-ЯІЇЄҐ][а-яіїєґ]+)/g, replace: '$1\u00A0$2' }, // Ініціал та прізвище, напр. А. Шевченко
+    { find: /(\s[—-])(\s*)/g, replace: '\u00A0$1 ' }, // Нерозривний пробіл перед тире
+  ];
+
+  // Застосовуємо всі правила з масиву
+  rules.forEach(applyRule);
+
+  // 8. Складне правило для лапок: замінюємо прямі лапки на «ялинки»
+  let inQuote = false;
+  const quoteFixedText = text.replace(/["“”„]/g, () => {
+    inQuote = !inQuote;
+    return inQuote ? '«' : '»';
+  });
+  if (text !== quoteFixedText) {
+      const matches = text.match(/["“”„]/g);
+      if(matches) fixesCount += matches.length;
+      text = quoteFixedText;
+  }
+
+
+  document.getElementById("text-input").value = text;
+  updateStatus(`Виправлення завершено.`, fixesCount);
+}
+
+// ==== ДОПОМІЖНІ ФУНКЦІЇ ====
+
+function copyText() {
+  const text = document.getElementById("text-input").value;
+  if (!text) {
+      updateStatus("Немає що копіювати.", 0);
+      return;
+  }
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      updateStatus("Текст скопійовано до буфера обміну.", -1); // -1 щоб не показувати лічильник
+    })
+    .catch(err => {
+      updateStatus("Не вдалося скопіювати текст: " + err, 0);
     });
+}
 
+function clearText() {
+  document.getElementById("text-input").value = "";
+  updateStatus("Поле очищено.", 0);
+}
 
-    // ==== ОСНОВНА ЛОГІКА КОРЕКТОРА ====
-
-    function cleanupText() {
-      let text = document.getElementById("text-input").value;
-      if (!text) {
-        updateStatus("Поле вводу порожнє.", 0);
-        return;
-      }
-      
-      let originalText = text;
-      let fixesCount = 0;
-
-      // Функція для застосування правила та підрахунку змін
-      function applyRule(rule) {
-        const newText = text.replace(rule.find, rule.replace);
-        if (text !== newText) {
-          // Простий спосіб підрахунку: вважаємо, що кожне застосування правила - це одна або більше правок
-          const matches = text.match(rule.find);
-          if(matches) fixesCount += matches.length;
-        }
-        text = newText;
-      }
-
-      // Масив правил для виправлення тексту
-      const rules = [
-        // 1. Нормалізація (завжди першим)
-        { find: /[\r\n]+/g, replace: '\n' }, // Нормалізуємо переноси рядків
-
-        // 2. Видалення зайвих пробілів
-        { find: / {2,}/g, replace: ' ' }, // Подвійні пробіли
-        { find: /^\s+|\s+$/g, replace: '' }, // Пробіли на початку та в кінці тексту
-        { find: /\s+([.,;:!?»)])/g, replace: '$1' }, // Пробіл перед розділовими знаками
-        { find: /\(\s+/g, replace: '(' }, // Пробіл після відкриваючої дужки
-        { find: /\s+\)/g, replace: ')' }, // Пробіл перед закриваючою дужкою
-
-        // 3. Правильний апостроф
-        { find: /['`ʼ]/g, replace: '’' },
-
-        // 4. Тире замість дефіса
-        { find: / - /g, replace: ' — ' }, // Довге тире між словами
-        { find: /^[-–] /gm, replace: '— ' }, // Тире на початку рядка для прямої мови
-
-        // 5. Виправлення багатокрапки
-        { find: /\.{2,}/g, replace: '...' },
-        { find: /…/g, replace: '...' }, // Уніфікація символу багатокрапки
-
-        // 6. Додавання необхідних пробілів
-        { find: /([.,;:!?»)])([^\s»”’])/g, replace: '$1 $2' }, // Додаємо пробіл після розділового знака, якщо його немає
-
-        // 7. Нерозривні пробіли (дуже корисно для типографії)
-        { find: /(\s[А-ЯІЇЄҐ])\.(\s*[А-ЯІЇЄҐ]\.)/g, replace: '$1.\u00A0$2' }, // Ініціали, напр. А. В. Шевченко
-        { find: /(\s[А-ЯІЇЄҐ]\.)(\s*[А-ЯІЇЄҐ][а-яіїєґ]+)/g, replace: '$1\u00A0$2' }, // Ініціал та прізвище, напр. А. Шевченко
-        { find: /(\s[—-])(\s*)/g, replace: '\u00A0$1 ' }, // Нерозривний пробіл перед тире
-      ];
-
-      // Застосовуємо всі правила з масиву
-      rules.forEach(applyRule);
-
-      // 8. Складне правило для лапок: замінюємо прямі лапки на «ялинки»
-      let inQuote = false;
-      const quoteFixedText = text.replace(/["“”„]/g, () => {
-        inQuote = !inQuote;
-        return inQuote ? '«' : '»';
-      });
-      if (text !== quoteFixedText) {
-          const matches = text.match(/["“”„]/g);
-          if(matches) fixesCount += matches.length;
-          text = quoteFixedText;
-      }
-
-
-      document.getElementById("text-input").value = text;
-      updateStatus(`Виправлення завершено.`, fixesCount);
+function updateStatus(message, count) {
+    const statusLabel = document.getElementById("status-label");
+    if (count > 0) {
+        statusLabel.innerHTML = `${message} Знайдено виправлень: <span id="fixes-count">${count}</span>`;
+    } else if (count === -1) { // Спеціальний випадок для копіювання
+        statusLabel.innerHTML = message;
+    } else {
+        statusLabel.innerHTML = message;
     }
-
-    // ==== ДОПОМІЖНІ ФУНКЦІЇ ====
-
-    function copyText() {
-      const text = document.getElementById("text-input").value;
-      if (!text) {
-          updateStatus("Немає що копіювати.", 0);
-          return;
-      }
-      navigator.clipboard.writeText(text)
-        .then(() => {
-          updateStatus("Текст скопійовано до буфера обміну.", -1); // -1 щоб не показувати лічильник
-        })
-        .catch(err => {
-          updateStatus("Не вдалося скопіювати текст: " + err, 0);
-        });
-    }
-
-    function clearText() {
-      document.getElementById("text-input").value = "";
-      updateStatus("Поле очищено.", 0);
-    }
-
-    function updateStatus(message, count) {
-        const statusLabel = document.getElementById("status-label");
-        if (count > 0) {
-            statusLabel.innerHTML = `${message} Знайдено виправлень: <span id="fixes-count">${count}</span>`;
-        } else if (count === -1) { // Спеціальний випадок для копіювання
-            statusLabel.innerHTML = message;
-        } else {
-            statusLabel.innerHTML = message;
-        }
-    }
+}
   </script>
 
 </body>
