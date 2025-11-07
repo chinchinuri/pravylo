@@ -1,122 +1,182 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
-  <title>ПравИло</title>
-  <link rel="stylesheet" href="style.css">
+  <title>ПравИло — Досконалий коректор текстів</title>
   <meta charset="UTF-8">
-  <style>
-    /* Додаємо тут будь-які додаткові стилі, якщо потрібно */
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      border: 1px solid #dee2e6;
-      border-radius: 5px;
-      background-color: #f0f4f8;
-    }
-    textarea {
-      width: 100%;
-      height: 300px;
-      margin-bottom: 10px;
-      padding: 10px;
-      border: 2px solid #767676;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-    .button-container {
-      margin-bottom: 10px;
-    }
-    .description {
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 10px;
-      text-align: center;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- Кнопка для перемикання теми -->
+  <div class="theme-switcher">
+    <button id="theme-toggle-button" onclick="toggleTheme()" title="Змінити тему"></button>
+  </div>
+
   <div class="container">
     <h1>ПравИло</h1>
-    <h3>Коректор текстів на мінімалках</h3>
+    <h3>Досконалий коректор українських текстів</h3>
 
-    <textarea id="text-input"></textarea>
+    <textarea id="text-input" placeholder="Вставте ваш текст сюди..."></textarea>
 
     <div class="button-container">
       <button onclick="cleanupText()">Виправити текст</button>
-      <button onclick="copyText()">Копіювати текст</button>
-      <button onclick="clearText()">Очистити поле</button>
+      <button onclick="copyText()" class="secondary">Копіювати текст</button>
+      <button onclick="clearText()" class="secondary">Очистити поле</button>
     </div>
 
     <p id="status-label"></p>
 
     <p class="description">
-      Цей інструмент виправляє типові помилки в українському тексті: подвійні пробіли, неправильні лапки (замінює на «та »),
-      некоректні апострофи (замінює на ’), довге тире (—), багатокрапки (...), видаляє зайві пробіли перед розділовими знаками
-      та виправляє лапки на початку рядка.
+      Цей інструмент автоматично виправляє поширені друкарські та пунктуаційні помилки, перетворюючи текст на професійно відформатований.
+      Він розставляє правильні лапки, тире, апострофи, прибирає зайві пробіли та додає нерозривні для кращої читабельності.
     </p>
   </div>
 
   <script>
-    function cleanupText() {
-      let text = document.getElementById("text-input").value;
+    // ==== ЛОГІКА ПЕРЕМИКАННЯ ТЕМИ ====
+    const themeToggleButton = document.getElementById('theme-toggle-button');
+    const sunIcon = '☀️';
+    const moonIcon = '🌙';
 
-      // Переконаємося, що текст обробляється без пошкодження
-      text = text.normalize("NFC"); // Нормалізація тексту для уникнення проблем із кодуванням
-
-      // Замінюємо типові помилки
-      text = text.replace(/ {2,}/g, " "); // Заміна подвійних і триваліших пробілів
-      text = text.replace(/'"/g, "«");  // Відкриваюча лапка
-      text = text.replace(/"'/g, "»");  // Закриваюча лапка
-      text = text.replace(/“/g, "«");    // Американські лапки
-      text = text.replace(/”/g, "»");    // Американські лапки
-      text = text.replace(/ - /g, " — "); // Довге тире
-      text = text.replace(/…/g, "...");  // Багатокрапка
-      text = text.replace(/'/g, "’");    // Апостроф
-      text = text.replace(/ʼ/g, "’");    // Альтернативний апостроф
-
-      // Видаляємо зайві пробіли перед розділовими знаками
-      text = text.replace(/ \./g, ".");
-      text = text.replace(/ ,/g, ",");
-      text = text.replace(/ !/g, "!");
-      text = text.replace(/ \?/g, "?");
-
-      // Пробіли перед лапками
-      text = text.replace(/ “/g, " «");
-      text = text.replace(/ "/g, " «");
-      text = text.replace(/” /g, "» ");
-      text = text.replace(/”,/g, "»,");
-      text = text.replace(/”\./g, "».");
-      text = text.replace(/" /g, "» ");
-      text = text.replace(/",/g, "»,");
-      text = text.replace(/"\./g, "».");
-
-      // Заміна лапок на початку рядка
-      text = text.replace(/^"/gm, "«"); // Замінює лапки " на початку кожного рядка на «
-      text = text.replace(/^“/gm, "«"); // Замінює лапки " на початку кожного рядка на «
-
-      // Видаляємо всі випадкові знаки питання
-      text = text.replace(/\?/g, ""); // Забираємо всі випадкові `?`
-
-      document.getElementById("text-input").value = text;
-      document.getElementById("status-label").textContent = "Текст виправлено.";
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggleButton.innerHTML = sunIcon;
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeToggleButton.innerHTML = moonIcon;
+        }
     }
 
-    function copyText() {
-      let text = document.getElementById("text-input").value;
-      navigator.clipboard.writeText(text)
-        .then(() => {
-          document.getElementById("status-label").textContent = "Текст скопійовано до буфера обміну.";
-        })
-        .catch(err => {
-          document.getElementById("status-label").textContent = "Не вдалося скопіювати текст: " + err;
+    function toggleTheme() {
+        const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    });
+
+    
+    // ==== ОСНОВНА ЛОГІКА КОРЕКТОРА ====
+    function cleanupText() {
+        let text = document.getElementById("text-input").value;
+        if (!text.trim()) {
+            updateStatus("Поле вводу порожнє.", 0);
+            return;
+        }
+
+        let fixesCount = 0;
+        const placeholders = {};
+        let placeholderIndex = 0;
+
+        // --- ЕТАП 0: ЗАХИСТ СПЕЦІАЛЬНИХ ФОРМАТІВ ---
+        const patternsToProtect = [
+            // Email-адреси
+            /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g,
+            // URL-адреси та доменні імена
+            /\b(https?:\/\/)?[a-zA-Z0-9.-]+\.(com|org|net|gov|ua|edu|dev|io|[a-z]{2,})(\/[^\s]*)?\b/g,
+            // Номери телефонів (різноманітні формати)
+            /(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,5}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4}/g
+        ];
+
+        patternsToProtect.forEach(pattern => {
+            text = text.replace(pattern, (match) => {
+                // Перевіряємо, щоб не захищати вже захищений фрагмент
+                if (match.startsWith('__PROTECTED_')) return match;
+                const placeholder = `__PROTECTED_${placeholderIndex++}__`;
+                placeholders[placeholder] = match;
+                return placeholder;
+            });
         });
+
+        function applyRule(find, replace) {
+            const matches = text.match(find);
+            if (matches) fixesCount += matches.length;
+            text = text.replace(find, replace);
+        }
+
+        // --- ЕТАП 1: БАЗОВА ОЧИСТКА ---
+        applyRule(/(\r\n|\r)/g, '\n');
+        applyRule(/\n{3,}/g, '\n\n');
+        applyRule(/[ \t]+$/gm, '');
+        text = text.trim();
+
+        // --- ЕТАП 2: РОБОТА З ПРОБІЛАМИ ТА ПУНКТУАЦІЄЮ ---
+        applyRule(/ {2,}/g, ' ');
+        applyRule(/\s+([.,;:!?»)])/g, '$1');
+        applyRule(/\(\s+/g, '(');
+        applyRule(/\s+\)/g, ')');
+        applyRule(/([.,;:!?»])([a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ])/g, '$1 $2');
+
+        // --- ЕТАП 3: ЗАМІНА СИМВОЛІВ І ТИПОГРАФІКА ---
+        applyRule(/['`ʼ]/g, '’');
+        applyRule(/ - /g, ' — ');
+        applyRule(/--/g, ' — ');
+        applyRule(/^[-–] /gm, '— ');
+        applyRule(/\.{2,}/g, '...');
+        applyRule(/…/g, '...');
+
+        // --- ЕТАП 4: СКЛАДНІ ПРАВИЛА (ЛАПКИ) ---
+        let textBeforeQuotes = text;
+        text = text.replace(/[“”„«»]/g, '"');
+        let inQuote = false;
+        text = text.replace(/"/g, () => !inQuote ? (inQuote = true, '«') : (inQuote = false, '»'));
+        const quoteMatches = textBeforeQuotes.match(/[“”„«»"]/g);
+        if (quoteMatches) fixesCount += quoteMatches.length;
+
+        // --- ЕТАП 5: НЕРОЗРИВНІ ПРОБІЛИ ---
+        applyRule(/(\s[А-ЯІЇЄҐ]\.)(\s*[А-ЯІЇЄҐ]\.)/g, '$1\u00A0$2');
+        applyRule(/(\s[А-ЯІЇЄҐ]\.)(\s*[А-ЯІЇЄҐ][а-яіїєґ]+)/g, '$1\u00A0$2');
+        applyRule(/(\s)—(\s)/g, '\u00A0—$2');
+        applyRule(/(\d)\s(грн|кг|м|см|шт|тис|млн|млрд)/g, '$1\u00A0$2');
+        applyRule(/(\s)(і|в|з|на|по|до|та|у|а|не|за|чи)(\s)/gi, '$1$2\u00A0');
+        
+        // --- ЕТАП 6: ВІДНОВЛЕННЯ ЗАХИЩЕНИХ ФРАГМЕНТІВ ---
+        for (const placeholder in placeholders) {
+            text = text.replace(placeholder, placeholders[placeholder]);
+        }
+
+        // --- ЗАВЕРШЕННЯ ---
+        document.getElementById("text-input").value = text;
+        
+        if (fixesCount > 0) {
+            updateStatus("Текст успішно виправлено.", fixesCount);
+        } else {
+            updateStatus("Не знайдено помилок для виправлення.", 0);
+        }
+    }
+
+    // --- ДОПОМІЖНІ ФУНКЦІЇ ---
+    function copyText() {
+        const text = document.getElementById("text-input").value;
+        if (!text) {
+            updateStatus("Немає що копіювати.", 0);
+            return;
+        }
+        navigator.clipboard.writeText(text)
+            .then(() => updateStatus("Текст скопійовано до буфера обміну.", -1))
+            .catch(() => updateStatus("Помилка копіювання.", 0));
     }
 
     function clearText() {
-      document.getElementById("text-input").value = "";
-      document.getElementById("status-label").textContent = "Поле очищено.";
+        document.getElementById("text-input").value = "";
+        updateStatus("Поле очищено.", 0);
+    }
+
+    function updateStatus(message, count) {
+        const statusLabel = document.getElementById("status-label");
+        if (count > 0) {
+            statusLabel.innerHTML = `${message} Знайдено виправлень: <span id="fixes-count">${count}</span>`;
+        } else if (count === -1) {
+            statusLabel.innerHTML = message;
+        } else {
+            statusLabel.innerHTML = message;
+        }
     }
   </script>
 </body>
