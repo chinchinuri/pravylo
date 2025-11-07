@@ -18,20 +18,30 @@
 /* Основні кольори для доступності */
 :root {
     --text-color: #1a1a1a;
-    --text-muted-color: rgba(128, 128, 128, 0.75);
-    --background-color: #ffffff;
+    --text-muted-color: #555;
+    --background-color: #f0f4f8;
+    --content-bg-color: #ffffff;
     --primary-color: #000000;
-    --secondary-color: #ffffff;
     --highlight-color: #FFD600;
     --error-color: #d32f2f;
     --success-color: #2e7d32;
-    --warning-color: #ed6c02;
     --link-color: #0052cc;
     --link-hover: #003d99;
     --focus-outline: #2684ff;
-    --dark-bg-color: #1A1A1A;
-    --dark-text-color: #FFFFFF;
-    --dark-primary-color: #333333;
+    --border-color: #dee2e6;
+    --button-secondary-bg: #6c757d;
+    --button-secondary-hover: #5a6268;
+
+    /* Dark Theme */
+    --dark-bg-color: #121212;
+    --dark-content-bg-color: #1e1e1e;
+    --dark-text-color: #e0e0e0;
+    --dark-border-color: #444;
+}
+
+/* Плавний перехід для темної теми */
+body, .container, textarea, input, select {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Темна тема */
@@ -40,29 +50,47 @@ body.dark-mode {
     color: var(--dark-text-color);
 }
 
+body.dark-mode .container {
+    background-color: var(--dark-content-bg-color);
+    border-color: var(--dark-border-color);
+}
+
+body.dark-mode textarea {
+    background-color: #2c2c2c;
+    color: var(--dark-text-color);
+    border-color: var(--dark-border-color);
+}
+
+body.dark-mode a {
+    color: #90caf9;
+}
+
+body.dark-mode a:hover {
+    color: #bbdefb;
+}
+
+body.dark-mode .description {
+    color: #aaa;
+}
+
 /* Типографія */
 body {
     font-family: 'e-Ukraine', sans-serif;
     font-size: 18px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: var(--text-color);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 }
 
-h1 { font-size: 42px; line-height: 44px; }
-h2 { font-size: 32px; line-height: 36px; }
-h3 { font-size: 28px; line-height: 32px; }
-h4 { font-size: 24px; line-height: 28px; }
-h5 { font-size: 20px; line-height: 28px; }
-h6, p, li { font-size: 18px; line-height: 28px; }
-
-/* Масштабування тексту */
-p, li, td, th, button, input, select, textarea {
-    font-size: 1rem;
-}
+h1 { font-size: 42px; line-height: 44px; margin-top: 0; }
+h3 { font-size: 24px; line-height: 28px; color: var(--text-muted-color); font-weight: normal; margin-bottom: 2rem; }
+p, li { font-size: 18px; line-height: 28px; }
 
 /* Посилання */
 a {
@@ -74,10 +102,6 @@ a:hover {
     color: var(--link-hover);
 }
 
-a:visited {
-    color: #551a8b;
-}
-
 /* Фокус та інтерактивні елементи */
 :focus {
     outline: 3px solid var(--focus-outline);
@@ -85,7 +109,7 @@ a:visited {
 }
 
 a:focus, button:focus, input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 0 3px rgba(38, 132, 255, 0.25);
+    box-shadow: 0 0 0 3px rgba(38, 132, 255, 0.35);
 }
 
 /* Кнопки */
@@ -93,217 +117,133 @@ button, .button {
     background-color: var(--link-color);
     color: white;
     border: none;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    font-size: 1rem;
 }
 
 button:hover, .button:hover {
     background-color: var(--link-hover);
 }
 
+/* Стилі для другорядних кнопок */
+button.secondary {
+    background-color: var(--button-secondary-bg);
+}
+
+button.secondary:hover {
+    background-color: var(--button-secondary-hover);
+}
+
 /* Поля вводу */
-input, select, textarea {
+textarea {
     border: 2px solid #767676;
-    border-radius: 4px;
-    padding: 0.5rem;
+    border-radius: 5px;
+    padding: 0.75rem;
     width: 100%;
-}
-
-.card {
-    border: none;
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.075);
-    margin-bottom: 20px; /* Додаємо відступ знизу */
-}
-
-.input-error {
-    border-color: var(--error-color);
-    animation: shake 0.3s;
-}
-
-.error-message {
-    color: var(--error-color);
-    font-weight: 500;
-    margin-top: 0.25rem;
-    padding-left: 0.5rem;
-    border-left: 3px solid var(--error-color);
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-10px); }
-    40%, 80% { transform: translateX(10px); }
+    box-sizing: border-box;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 /* Сітка */
 .container {
-    max-width: 1280px;
-    margin: 20px auto; /* Додаємо верхній та нижній відступ */
-    padding: 20px 24px; /* Додаємо відступ згори та знизу, щоб рамка не прилягала до контенту */
-    border: 1px solid #dee2e6; /* Додаємо тонку сіру рамку */
-    border-radius: 5px; /* Заокруглюємо кути рамки */
-    background-color: #f0f4f8; /* Світло-сірий фон */
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--content-bg-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.grid-12 {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 24px;
+/* Обгортка для кнопок */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Відстань між кнопками */
+    margin-bottom: 1rem;
 }
 
-/* Підтримка користувачів з кольоровою сліпотою */
-.highlight-important {
-    background-color: var(--highlight-color);
-    color: var(--primary-color);
-    padding: 5px;
-    border: 2px dashed var(--primary-color);
+/* Блок статусу */
+#status-label {
+    margin-top: 1rem;
+    color: var(--success-color);
+    font-weight: 500;
+    min-height: 24px; /* Резервуємо місце, щоб уникнути стрибків контенту */
 }
 
-/* Skip Links */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: var(--focus-outline);
+#status-label #fixes-count {
+    display: inline-block;
+    background-color: var(--success-color);
     color: white;
-    padding: 8px;
-    z-index: 100;
-    transition: top 0.3s ease;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    margin-left: 5px;
 }
 
-.skip-link:focus {
-    top: 0;
+.description {
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-top: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+/* Перемикач теми */
+.theme-switcher-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.theme-switcher-container button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    background-color: var(--button-secondary-bg);
+}
+.theme-switcher-container button:hover {
+    background-color: var(--button-secondary-hover);
 }
 
 /* Адаптивні стилі для мобільних */
 @media screen and (max-width: 768px) {
     body {
-        font-size: 14px;
+        font-size: 16px;
     }
+
+    .container {
+        margin: 20px 10px;
+        padding: 20px;
+    }
+
+    h1 { font-size: 32px; }
+    h3 { font-size: 20px; }
 
     button, .button, a {
         padding: 0.75rem;
         min-height: 44px;
-        min-width: 44px;
+        width: 100%; /* Кнопки на всю ширину для зручності */
+    }
+
+    .theme-switcher-container {
+        position: static;
+        text-align: center;
+        margin-top: 20px;
     }
 }
 
 /* Зменшення руху */
 @media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
-}
-
-/* Приховані елементи для екранних зчитувачів */
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.gov-header {
-    background-color: #003366;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-.gov-header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Розміщуємо елементи по краях */
-}
-
-.gov-header span.flag {
-    display: inline-block;
-    width: 5px;
-    height: 1.2em;
-    margin: 0 2px;
-}
-
-.gov-header span.flag:nth-child(1) {
-    background-color: #005bbb;
-}
-
-.gov-header span.flag:nth-child(2) {
-    background-color: #ffdd00;
-}
-
-.gov-ua-block {
-    text-align: left;
-}
-
-.gov-ua-block .flag {
-    display: inline-block;
-    width: 5px;
-    height: 1.2em;
-    margin: 0 2px;
-    vertical-align: middle;
-}
-
-.gov-ua-block .flag:nth-child(1) {
-    background-color: #005bbb;
-}
-
-.gov-ua-block .flag:nth-child(2) {
-    background-color: #ffdd00;
-}
-
-.gov-ua-block .gov-ua-text {
-    font-weight: bold;
-    font-size: 1.2em;
-    vertical-align: middle;
-}
-
-.gov-ua-block .gov-sites-text {
-    font-size: 0.5em;
-    vertical-align: middle;
-    display: block;
-    color: #cccccc;
-}
-
-.gov-logo {
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    flex-grow: 1; /* Розтягуємо на вільне місце */
-}
-
-.gov-logo img {
-    height: 2.5em;
-    margin: 0 auto;
-    display: block;
-}
-
-.service-name {
-    font-size: 1em;
-    text-align: center;
-    white-space: nowrap; /* Забороняємо перенос рядків */
-}
-
-.footer {
-    text-align: center;
-    color: #6c757d;
-    font-size: 0.8em;
-    padding: 10px; /* Додаємо відступ */
-    background-color: #fff; /* Білий фон */
-}
-
-/* Плавна зміна кольору для темної теми */
-body {
-    transition: background-color 0.3s, color 0.3s;
 }

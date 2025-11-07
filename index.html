@@ -1,123 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
-  <title>ПравИло</title>
+  <title>ПравИло - Розумний коректор текстів</title>
   <link rel="stylesheet" href="style.css">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Додаємо тут будь-які додаткові стилі, якщо потрібно */
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      border: 1px solid #dee2e6;
-      border-radius: 5px;
-      background-color: #f0f4f8;
-    }
+    /* Додаткові стилі для цього файлу, якщо вони не є глобальними */
     textarea {
-      width: 100%;
-      height: 300px;
-      margin-bottom: 10px;
-      padding: 10px;
-      border: 2px solid #767676;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-    .button-container {
-      margin-bottom: 10px;
-    }
-    .description {
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 10px;
-      text-align: center;
+      height: 350px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
+
+  <!-- Кнопка для перемикання теми -->
+  <div class="theme-switcher-container">
+    <button onclick="toggleTheme()" class="secondary">Змінити тему</button>
+  </div>
+
   <div class="container">
     <h1>ПравИло</h1>
-    <h3>Коректор текстів на мінімалках</h3>
+    <h3>Розумний коректор українських текстів</h3>
 
-    <textarea id="text-input"></textarea>
+    <textarea id="text-input" placeholder="Вставте ваш текст сюди..." aria-label="Поле для введення тексту"></textarea>
 
     <div class="button-container">
       <button onclick="cleanupText()">Виправити текст</button>
-      <button onclick="copyText()">Копіювати текст</button>
-      <button onclick="clearText()">Очистити поле</button>
+      <button onclick="copyText()" class="secondary">Копіювати текст</button>
+      <button onclick="clearText()" class="secondary">Очистити поле</button>
     </div>
 
+    <!-- Оновлений блок статусу -->
     <p id="status-label"></p>
 
     <p class="description">
-      Цей інструмент виправляє типові помилки в українському тексті: подвійні пробіли, неправильні лапки (замінює на «та »),
-      некоректні апострофи (замінює на ’), довге тире (—), багатокрапки (...), видаляє зайві пробіли перед розділовими знаками
-      та виправляє лапки на початку рядка.
+      Цей інструмент автоматично виправляє поширені друкарські та пунктуаційні помилки в українському тексті. 
+      Він замінює прямі лапки на типографські «ялинки», некоректні апострофи на правильний (’), дефіси на тире (—), 
+      видаляє зайві пробіли та виконує багато інших мікрополіпшень для чистоти вашого тексту.
     </p>
   </div>
 
   <script>
-    function cleanupText() {
-      let text = document.getElementById("text-input").value;
+    // ==== ЛОГІКА ПЕРЕМИКАННЯ ТЕМИ ====
 
-      // Переконаємося, що текст обробляється без пошкодження
-      text = text.normalize("NFC"); // Нормалізація тексту для уникнення проблем із кодуванням
-
-      // Замінюємо типові помилки
-      text = text.replace(/ {2,}/g, " "); // Заміна подвійних і триваліших пробілів
-      text = text.replace(/'"/g, "«");  // Відкриваюча лапка
-      text = text.replace(/"'/g, "»");  // Закриваюча лапка
-      text = text.replace(/“/g, "«");    // Американські лапки
-      text = text.replace(/”/g, "»");    // Американські лапки
-      text = text.replace(/ - /g, " — "); // Довге тире
-      text = text.replace(/…/g, "...");  // Багатокрапка
-      text = text.replace(/'/g, "’");    // Апостроф
-      text = text.replace(/ʼ/g, "’");    // Альтернативний апостроф
-
-      // Видаляємо зайві пробіли перед розділовими знаками
-      text = text.replace(/ \./g, ".");
-      text = text.replace(/ ,/g, ",");
-      text = text.replace(/ !/g, "!");
-      text = text.replace(/ \?/g, "?");
-
-      // Пробіли перед лапками
-      text = text.replace(/ “/g, " «");
-      text = text.replace(/ "/g, " «");
-      text = text.replace(/” /g, "» ");
-      text = text.replace(/”,/g, "»,");
-      text = text.replace(/”\./g, "».");
-      text = text.replace(/" /g, "» ");
-      text = text.replace(/",/g, "»,");
-      text = text.replace(/"\./g, "».");
-
-      // Заміна лапок на початку рядка
-      text = text.replace(/^"/gm, "«"); // Замінює лапки " на початку кожного рядка на «
-      text = text.replace(/^“/gm, "«"); // Замінює лапки " на початку кожного рядка на «
-
-      // Видаляємо всі випадкові знаки питання
-      text = text.replace(/\?/g, ""); // Забираємо всі випадкові `?`
-
-      document.getElementById("text-input").value = text;
-      document.getElementById("status-label").textContent = "Текст виправлено.";
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     }
 
-    function copyText() {
+    // Застосовуємо збережену тему при завантаженні сторінки
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+    });
+
+
+    // ==== ОСНОВНА ЛОГІКА КОРЕКТОРА ====
+
+    function cleanupText() {
       let text = document.getElementById("text-input").value;
+      if (!text) {
+        updateStatus("Поле вводу порожнє.", 0);
+        return;
+      }
+      
+      let originalText = text;
+      let fixesCount = 0;
+
+      // Функція для застосування правила та підрахунку змін
+      function applyRule(rule) {
+        const newText = text.replace(rule.find, rule.replace);
+        if (text !== newText) {
+          // Простий спосіб підрахунку: вважаємо, що кожне застосування правила - це одна або більше правок
+          const matches = text.match(rule.find);
+          if(matches) fixesCount += matches.length;
+        }
+        text = newText;
+      }
+
+      // Масив правил для виправлення тексту
+      const rules = [
+        // 1. Нормалізація (завжди першим)
+        { find: /[\r\n]+/g, replace: '\n' }, // Нормалізуємо переноси рядків
+
+        // 2. Видалення зайвих пробілів
+        { find: / {2,}/g, replace: ' ' }, // Подвійні пробіли
+        { find: /^\s+|\s+$/g, replace: '' }, // Пробіли на початку та в кінці тексту
+        { find: /\s+([.,;:!?»)])/g, replace: '$1' }, // Пробіл перед розділовими знаками
+        { find: /\(\s+/g, replace: '(' }, // Пробіл після відкриваючої дужки
+        { find: /\s+\)/g, replace: ')' }, // Пробіл перед закриваючою дужкою
+
+        // 3. Правильний апостроф
+        { find: /['`ʼ]/g, replace: '’' },
+
+        // 4. Тире замість дефіса
+        { find: / - /g, replace: ' — ' }, // Довге тире між словами
+        { find: /^[-–] /gm, replace: '— ' }, // Тире на початку рядка для прямої мови
+
+        // 5. Виправлення багатокрапки
+        { find: /\.{2,}/g, replace: '...' },
+        { find: /…/g, replace: '...' }, // Уніфікація символу багатокрапки
+
+        // 6. Додавання необхідних пробілів
+        { find: /([.,;:!?»)])([^\s»”’])/g, replace: '$1 $2' }, // Додаємо пробіл після розділового знака, якщо його немає
+
+        // 7. Нерозривні пробіли (дуже корисно для типографії)
+        { find: /(\s[А-ЯІЇЄҐ])\.(\s*[А-ЯІЇЄҐ]\.)/g, replace: '$1.\u00A0$2' }, // Ініціали, напр. А. В. Шевченко
+        { find: /(\s[А-ЯІЇЄҐ]\.)(\s*[А-ЯІЇЄҐ][а-яіїєґ]+)/g, replace: '$1\u00A0$2' }, // Ініціал та прізвище, напр. А. Шевченко
+        { find: /(\s[—-])(\s*)/g, replace: '\u00A0$1 ' }, // Нерозривний пробіл перед тире
+      ];
+
+      // Застосовуємо всі правила з масиву
+      rules.forEach(applyRule);
+
+      // 8. Складне правило для лапок: замінюємо прямі лапки на «ялинки»
+      let inQuote = false;
+      const quoteFixedText = text.replace(/["“”„]/g, () => {
+        inQuote = !inQuote;
+        return inQuote ? '«' : '»';
+      });
+      if (text !== quoteFixedText) {
+          const matches = text.match(/["“”„]/g);
+          if(matches) fixesCount += matches.length;
+          text = quoteFixedText;
+      }
+
+
+      document.getElementById("text-input").value = text;
+      updateStatus(`Виправлення завершено.`, fixesCount);
+    }
+
+    // ==== ДОПОМІЖНІ ФУНКЦІЇ ====
+
+    function copyText() {
+      const text = document.getElementById("text-input").value;
+      if (!text) {
+          updateStatus("Немає що копіювати.", 0);
+          return;
+      }
       navigator.clipboard.writeText(text)
         .then(() => {
-          document.getElementById("status-label").textContent = "Текст скопійовано до буфера обміну.";
+          updateStatus("Текст скопійовано до буфера обміну.", -1); // -1 щоб не показувати лічильник
         })
         .catch(err => {
-          document.getElementById("status-label").textContent = "Не вдалося скопіювати текст: " + err;
+          updateStatus("Не вдалося скопіювати текст: " + err, 0);
         });
     }
 
     function clearText() {
       document.getElementById("text-input").value = "";
-      document.getElementById("status-label").textContent = "Поле очищено.";
+      updateStatus("Поле очищено.", 0);
+    }
+
+    function updateStatus(message, count) {
+        const statusLabel = document.getElementById("status-label");
+        if (count > 0) {
+            statusLabel.innerHTML = `${message} Знайдено виправлень: <span id="fixes-count">${count}</span>`;
+        } else if (count === -1) { // Спеціальний випадок для копіювання
+            statusLabel.innerHTML = message;
+        } else {
+            statusLabel.innerHTML = message;
+        }
     }
   </script>
+
 </body>
 </html>
