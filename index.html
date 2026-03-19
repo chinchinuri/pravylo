@@ -673,10 +673,9 @@
                oninput="saveKey()" autocomplete="off"/>
         <select id="gemini-model" class="api-key-input" style="display:none; width:auto; cursor:pointer;" 
                 onchange="localStorage.setItem('pravylo_gemini_model', this.value)">
-          <option value="gemini-1.5-flash">gemini-1.5-flash (безкоштовно)</option>
-          <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-          <option value="gemini-2.0-flash">gemini-2.0-flash (платно)</option>
-          <option value="gemini-2.5-pro-preview-03-25">gemini-2.5-pro</option>
+          <option value="gemini-2.5-flash-preview-04-17">gemini-2.5-flash (безкоштовно)</option>
+          <option value="gemini-2.0-flash">gemini-2.0-flash (безкоштовно)</option>
+          <option value="gemini-2.5-pro-preview-05-06">gemini-2.5-pro (платно)</option>
         </select>
       </div>
       <div class="footer-text">
@@ -700,7 +699,7 @@
       google: {
         placeholder: 'AIza...',
         storageKey: 'pravylo_api_key_google',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash-preview-04-17',
       },
     };
 
@@ -718,7 +717,7 @@
       if (modelSel) {
         modelSel.style.display = provider === 'google' ? 'inline-block' : 'none';
         if (provider === 'google') {
-          const saved = localStorage.getItem('pravylo_gemini_model') || 'gemini-1.5-flash';
+          const saved = localStorage.getItem('pravylo_gemini_model') || 'gemini-2.5-flash-preview-04-17';
           modelSel.value = saved;
         }
       }
